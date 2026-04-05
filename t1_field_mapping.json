@@ -1,0 +1,182 @@
+{
+  "t1_output_version": "2.0",
+  "description": "Mapping ระหว่าง T1 Tri-Core JSON output กับ T2 Document Template placeholders",
+  "_comment": "ใช้ Decoupling design — เปลี่ยน T1 structure ได้โดยแก้ไฟล์นี้ที่เดียว",
+  
+  "field_mappings": {
+    "threat_summary": {
+      "json_path": "threat_summary",
+      "fields": {
+        "name":         {"t2_placeholder": "{THREAT_NAME}",         "description": "ชื่อ threat เช่น BlackBasta"},
+        "type":          {"t2_placeholder": "{THREAT_TYPE}",       "description": "ประเภท เช่น Ransomware"},
+        "severity":      {"t2_placeholder": "{SEVERITY_LEVEL}",   "description": "CRITICAL/HIGH/MEDIUM/LOW"},
+        "attack_vector":  {"t2_placeholder": "{ATTACK_VECTOR}",     "description": "เวกเตอร์ เช่น Profinet, VPN"},
+        "ttp_ids":       {"t2_placeholder": "{TTP_IDS}",           "description": "MITRE ATT&CK IDs"}
+      }
+    },
+    
+    "asset_analysis": {
+      "json_path": "asset_analysis",
+      "array_fields": {
+        "name":          {"t2_placeholder": "{AFFECTED_ASSET}",   "description": "ชื่ออุปกรณ์ เช่น S7-1500"},
+        "type":          {"t2_placeholder": "{ASSET_TYPE}",         "description": "ประเภท เช่น PLC, HMI, SCADA"},
+        "criticality":   {"t2_placeholder": "{CRITICALITY}",        "description": "CRITICAL/HIGH/MEDIUM/LOW"},
+        "max_vuln":      {"t2_placeholder": "{MAX_VULN_COUNT}",    "description": "จำนวน vulnerabilities สูงสุด"},
+        "firmware":      {"t2_placeholder": "{FIRMWARE}",          "description": "เวอร์ชัน firmware ถ้ามี"},
+        "zone":          {"t2_placeholder": "{ZONE_NAME}",          "description": "IEC 62443 zone เช่น L3 Enterprise"}
+      }
+    },
+    
+    "sl_assessment": {
+      "json_path": "sl_assessment",
+      "fields": {
+        "current_sl":    {"t2_placeholder": "{SL_CURRENT}",         "description": "Security Level ปัจจุบัน"},
+        "target_sl":     {"t2_placeholder": "{SL_TARGET}",           "description": "Security Level เป้าหมาย"},
+        "gap":           {"t2_placeholder": "{SL_GAP}",              "description": "SL Gap (target - current)"}
+      }
+    },
+    
+    "wisdom_matches": {
+      "json_path": "wisdom_matches",
+      "array_fields": {
+        "pattern_id":    {"t2_placeholder": "{WISDOM_PATTERN_ID}", "description": "Pattern ID เช่น W-108-05"},
+        "steps":         {"t2_placeholder": "{WISDOM_STEPS}",      "description": "ขั้นตอนจาก Wisdom database"}
+      }
+    },
+
+    "risk_score": {
+      "json_path": "risk_score",
+      "fields": {
+        "overall":       {"t2_placeholder": "{RISK_SCORE}",          "description": "คะแนนความเสี่ยงรวม 1-100"},
+        "likelihood":    {"t2_placeholder": "{LIKELIHOOD}",         "description": "ความน่าจะเป็น 1-10"},
+        "impact":        {"t2_placeholder": "{IMPACT_LEVEL}",        "description": "ระดับผลกระทบ 1-10"}
+      }
+    }
+  },
+
+  "severity_to_tier_mapping": {
+    "CRITICAL": {
+      "pricing_tier": "Enterprise",
+      "tier_code": "E",
+      "price_range": "฿295,000 - ฿395,000",
+      "tier_color": "🔴",
+      "urgency_multiplier": "2x",
+      "recommended_procedures": ["Full L2", "Tabletop", "24/7 SOC"]
+    },
+    "HIGH": {
+      "pricing_tier": "Pro",
+      "tier_code": "P",
+      "price_range": "฿165,000 - ฿245,000",
+      "tier_color": "🟠",
+      "urgency_multiplier": "1.5x",
+      "recommended_procedures": ["L2 Procedure", "IR Drill"]
+    },
+    "MEDIUM": {
+      "pricing_tier": "Standard",
+      "tier_code": "S",
+      "price_range": "฿125,000 - ฿165,000",
+      "tier_color": "🟡",
+      "urgency_multiplier": "1x",
+      "recommended_procedures": ["L1 Policy", "Basic IR"]
+    },
+    "LOW": {
+      "pricing_tier": "Base",
+      "tier_code": "B",
+      "price_range": "฿95,000 - ฿125,000",
+      "tier_color": "🟢",
+      "urgency_multiplier": "0.5x",
+      "recommended_procedures": ["L1 Policy"]
+    }
+  },
+
+  "core6_verbatims": {
+    "m58_72h": {
+      "id": "TH-CYBER-58",
+      "article": "มาตรา 58",
+      "key_requirement": "แจ้ง NCSA ภายใน 72 ชั่วโมง นับแต่ทราบเหตุ",
+      "hard_constraints": {
+        "deadline_hours": 72,
+        "reporting_authority": "NCSA",
+        "report_content": ["ลักษณะเหตุ", "ผลกระทบ", "มาตรการที่ดำเนินการแล้ว"]
+      },
+      "penalty": {
+        "fine_max": "1,000,000 บาท",
+        "reputational": "NCSA เปิดเผยชื่อต่อสาธารณะ"
+      },
+      "conflict_resolution": "ALWAYS_WIN"
+    },
+    "m59_24h": {
+      "id": "TH-CYBER-59",
+      "article": "มาตรา 59",
+      "key_requirement": "แจ้งภายใน 24 ชั่วโมง กรณีภัยคุกคามร้ายแรง/กระทบความมั่นคงของรัฐ",
+      "hard_constraints": {
+        "deadline_hours": 24,
+        "reporting_authority": "NCSA",
+        "report_content": ["ลักษณะเหตุ", "ผลกระทบ", "มาตรการที่ดำเนินการแล้ว"]
+      },
+      "trigger_condition": "ภัยคุกคามร้ายแรงหรืออาจกระทบความมั่นคงของรัฐ",
+      "conflict_resolution": "T1_CAN_RECOMMEND_BELOW"
+    },
+    "m54_selfassess": {
+      "id": "TH-CYBER-54",
+      "article": "มาตรา 54",
+      "key_requirement": "ประเมินตนเอง (Self-Assessment) เทียบมาตรฐานขั้นต่ำ อย่างน้อยปีละ 1 ครั้ง",
+      "hard_constraints": {
+        "frequency": "annual",
+        "evidence_required": ["รายงานผลการประเมิน", "หลักฐานประกอบ"]
+      },
+      "penalty": {
+        "fine_max": "200,000 บาท"
+      },
+      "conflict_resolution": "ALWAYS_WIN"
+    }
+  },
+
+  "t2_template_placeholders": {
+    "_comment": "Placeholders ที่ใช้ใน Document-Template-Draft.md",
+    "document": {
+      "{DOC_ID}": "Document ID เช่น POL-OT-IR-002",
+      "{DOC_VERSION}": "เวอร์ชัน เช่น 1.0",
+      "{EFFECTIVE_DATE}": "วันที่มีผล",
+      "{NEXT_REVIEW}": "วันที่ทบทวนครั้งถัดไป"
+    },
+    "threat": {
+      "{THREAT_NAME}": "ชื่อ threat เช่น BlackBasta, LockBit 3.0",
+      "{THREAT_TYPE}": "ประเภท เช่น Ransomware, APT, Malware",
+      "{SEVERITY_LEVEL}": "CRITICAL/HIGH/MEDIUM/LOW",
+      "{ATTACK_VECTOR}": "เวกเตอร์ เช่น Profinet, Remote VPN, Email Phishing",
+      "{TTP_IDS}": "MITRE ATT&CK IDs เช่น T1486, T1490"
+    },
+    "asset": {
+      "{AFFECTED_ASSET}": "ชื่ออุปกรณ์ เช่น S7-1500, ControlLogix",
+      "{ASSET_TYPE}": "ประเภท เช่น PLC, RTU, HMI, SCADA Server",
+      "{CRITICALITY}": "CRITICAL/HIGH/MEDIUM/LOW",
+      "{MAX_VULN_COUNT}": "จำนวน vulnerabilities สูงสุด",
+      "{FIRMWARE}": "เวอร์ชัน firmware",
+      "{ZONE_NAME}": "IEC 62443 zone เช่น L3 Enterprise, L2 Control"
+    },
+    "assessment": {
+      "{SL_CURRENT}": "Security Level ปัจบับ 0-4",
+      "{SL_TARGET}": "Security Level เป้าหมาย 0-4",
+      "{SL_GAP}": "SL Gap (target - current)"
+    },
+    "wisdom": {
+      "{WISDOM_PATTERN_ID}": "Pattern ID เช่น W-108-05",
+      "{WISDOM_STEPS}": "ขั้นตอนจาก Wisdom database"
+    },
+    "risk": {
+      "{RISK_SCORE}": "คะแนนความเสี่ยงรวม 1-100",
+      "{LIKELIHOOD}": "ความน่าจะเป็น 1-10",
+      "{IMPACT_LEVEL}": "ระดับผลกระทบ 1-10"
+    }
+  },
+
+  "log_fields": {
+    "sync_id": "UUID ของการ sync ครั้งนี้",
+    "t1_input_hash": "SHA256 ของ T1 JSON input",
+    "templates_used": ["Document-Template-Draft.md"],
+    "placeholders_filled": "จำนวน placeholders ที่ถูกเติม",
+    "overrides_log": "รายการ override ที่เกิดขึ้น",
+    "compliance_verified": "Boolean — ผ่าน Core 6 check หรือไม่"
+  }
+}
